@@ -1,0 +1,27 @@
+name: sonar
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/sonar.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/sonar.yml"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarqube-scan-action@v5.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

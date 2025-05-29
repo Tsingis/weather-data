@@ -1,0 +1,49 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      no_cache: false
+    image: weather-server
+    container_name: weather-server
+    ports:
+      - 8000:8000
+    environment:
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+    user: api
+    read_only: true
+    privileged: false
+    tmpfs:
+      - /tmp:rw
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      no_cache: false
+    depends_on:
+      server:
+        condition: service_started
+        restart: true
+    image: weather-client
+    container_name: weather-client
+    ports:
+      - 3000:3000
+    user: nginx
+    read_only: true
+    privileged: false
+    tmpfs:
+      - /tmp:rw
+  redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+      no_cache: false
+    image: weather-redis
+    container_name: weather-redis
+    ports:
+      - 6379:6379
+    read_only: true
+    privileged: false
+    tmpfs:
+      - /tmp:rw
